@@ -1,0 +1,37 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker.exposedByDefault=false"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  app1:
+    build: .
+    labels:
+      - "traefik.http.routers.myapp.rule=Host(`localhost`)"
+      - "traefik.http.services.myapp.loadbalancer.server.port=4000"
+      - "traefik.http.routers.myapp.entrypoints=web"
+      - "traefik.enable=true"
+
+  app2:
+    build: .
+    labels:
+      - "traefik.http.routers.myapp.rule=Host(`localhost`)"
+      - "traefik.http.services.myapp.loadbalancer.server.port=4000"
+      - "traefik.http.routers.myapp.entrypoints=web"
+      - "traefik.enable=true"
+
+  app3:
+    build: .
+    labels:
+      - "traefik.http.routers.myapp.rule=Host(`localhost`)"
+      - "traefik.http.services.myapp.loadbalancer.server.port=4000"
+      - "traefik.http.routers.myapp.entrypoints=web"
+      - "traefik.enable=true"
