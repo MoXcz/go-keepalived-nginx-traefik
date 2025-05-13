@@ -3,6 +3,8 @@
 Para usar `keepalived` es necesario tener al menos dos nodos (se puede usar con un unico nodo, pero no tendria mucho sentido). Se crean los contenedores de prueba:
 
 ```sh
+docker build . -t keepalived-node
+
 docker run -d --name node1 \
   --net keepalived-net \
   --ip 192.168.100.10 \

@@ -1,5 +1,57 @@
 # Load Balancer
 
+## Uso
+
+```sh
+# Clonar repo
+git clone https://github.com/MoXcz/go-keepalived-nginx-traefik.git && cd go-keepalived-nginx-traefik
+```
+
+### Traefik
+
+```sh
+docker compose up
+```
+
+### Nginx
+
+```sh
+cd nginx
+docker build . -t nginx-tmp && docker run -it --rm nginx-testing:latest
+# Dentro del contenedor:
+go run main.go &
+go run main.go --addr=":4001" &
+go run main.go --addr=":4002" &
+
+service nginx start
+nginx -s reload -t
+```
+
+### Keepalived
+
+```sh
+cd keepalived
+docker build . -t keepalived-node
+
+docker run -d --name node1 \
+  --net keepalived-net \
+  --ip 192.168.100.10 \
+  --cap-add=NET_ADMIN \
+  --cap-add=NET_RAW \
+  keepalived-node
+
+docker run -d --name node2 \
+  --net keepalived-net \
+  --ip 192.168.100.11 \
+  --cap-add=NET_ADMIN \
+  --cap-add=NET_RAW \
+  keepalived-node
+
+docker exec -it node2 bash # Se modifica el status (BACKUP) y priority (< 100)
+
+docker run -it --rm --net keepalived-net busybox ping 192.168.100.100
+```
+
 Un *load balancer* o *balanceador de carga* se encarga de distribuir la comunicación de diferentes conexiones entre múltiples servidores o instancias de una aplicación.
 
 Para utilizar un balanceador de carga es primero necesario tener las *cargas* que balancear, las cuales consisten en la comunicación que existe entre diferentes dispositivos (comúnmente servidores).
